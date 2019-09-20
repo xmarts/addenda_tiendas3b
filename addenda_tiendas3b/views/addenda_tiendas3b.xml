@@ -2,79 +2,119 @@
 <odoo>
   <data noupdate="0">
     <template name="Tiendas 3B" id="addenda_tiendas3b">
+
       <requestForPayment type="SimpleInvoiceType" contentVersion="1.3.1" documentStructureVersion="AMC7.1" documentStatus="ORIGINAL">
-        <t t-set="xml" t-value="record.l10n_mx_edi_get_xml_etree()" />
-        <deliveryDate t-field="record.date_invoice" t-options='{"format": "yyyy-MM-dd"}' />
+        <t t-set="xml" t-value="record.l10n_mx_edi_get_xml_etree()"/>
+        <deliveryDate t-field="record.date_invoice" t-options="{&quot;format&quot;: &quot;yyyy-MM-dd&quot;}"/>
         <requestForPaymentIdentification>
           <entityType>INVOICE</entityType>
-          <t t-set="folio" t-value="xml.get('Folio')" />
-          <t t-set="serie" t-value="xml.get('Serie')" />
-          <uniqueCreatorIdentification t-esc="str(serie)+str(folio)" />
+          <t t-set="folio" t-value="xml.get('Folio')"/>
+          <t t-set="serie" t-value="xml.get('Serie')"/>
+          <uniqueCreatorIdentification t-esc="str(serie)+str(folio)"/>
         </requestForPaymentIdentification>
         <specialInstruction code="ZZZ">
-          <text t-field="record.amount_to_text" />
+          <text t-field="record.amount_to_text"/>
         </specialInstruction>
         <orderIdentification>
-          <referenceIdentification type="ON" t-field="record.fields_sales.number_order" />
-          <ReferenceDate> </ReferenceDate>
+          <referenceIdentification type="ON" t-field="record.fields_sales.number_order"/>
+          <ReferenceDate t-field="record.date_invoice" t-options="{&quot;format&quot;: &quot;yyyy-MM-dd&quot;}" />
         </orderIdentification>
         <AdditionalInformation>
-          <referenceIdentification type="ATZ"></referenceIdentification>
+          <referenceIdentification type="ATZ"/>
         </AdditionalInformation>
         <DeliveryNote>
-          <referenceIdentification t-esc="str(serie)+str(folio)" />
-          <ReferenceDate t-field="record.fields_sales.date_order" t-options='{"format": "yyyy-MM-dd"}' />
+          <referenceIdentification t-esc="str(serie)+str(folio)"/>
+          <ReferenceDate t-field="record.date_invoice" t-options="{&quot;format&quot;: &quot;yyyy-MM-dd&quot;}"/>
         </DeliveryNote>
         <buyer>
-          <gln t-field="record.partner_id.gln" />
+          <gln t-field="record.partner_id.gln"/>
           <contactInformation>
             <personDepartamentName>
-              <text t-field="record.partner_id.user_id.name" />
+              <text t-field="record.partner_id.user_id.name"/>
             </personDepartamentName>
           </contactInformation>
         </buyer>
         <seller>
-          <gln t-field="record.partner_shipping_id.shipping_gln" />
-          <t t-set="numprov" t-value="record.partner_shipping_id.shipping_number_provider" />
-          <alternatePartyIdentification type="SELLER_ASSIGNED_IDENTIFIER_FOR_A_PARTY" t-esc="numprov" />
+          <gln t-field="record.partner_shipping_id.shipping_gln"/>
+          <t t-set="numprov" t-value="record.partner_shipping_id.shipping_number_provider"/>
+          <alternatePartyIdentification type="SELLER_ASSIGNED_IDENTIFIER_FOR_A_PARTY" t-esc="numprov"/>
         </seller>
         <shipTo>
           <gln t-field="record.partner_shipping_id.shipping_number_store"/>
           <nameAndAddress>
-            <name t-field="record.partner_shipping_id.name" />
-            <streetAddressOne t-field="record.partner_shipping_id.street" />
+            <name t-field="record.partner_shipping_id.name"/>
+            <streetAddressOne t-field="record.partner_shipping_id.street"/>
             <city t-field="record.partner_shipping_id.city"/>
             <postalCode t-field="record.partner_shipping_id.zip"/>
           </nameAndAddress>
         </shipTo>
-        <t t-set="cont" t-value="0" />
-        <t t-foreach="record.fields_sales.order_line" t-as="rec" >
-          <t t-set="cont" t-value="cont + 1" />
+        <t t-set="cont" t-value="0"/>
+        <t t-foreach="record.fields_sales.order_line" t-as="rec">
+          <t t-set="cont" t-value="cont + 1"/>
           <lineItem type="SimpleInvoiceLineItemType" t-att-number="cont">
             <tradeItemIdentification>
-              <gtin t-esc="rec.product_id.barcode" />
+              <gtin t-esc="rec.product_id.barcode"/>
             </tradeItemIdentification>
-            <alternateTradeItemIdentification type="BUYER_ASSIGNED" t-esc="rec.product_id.barcode" />
+            <alternateTradeItemIdentification type="BUYER_ASSIGNED" t-esc="rec.product_id.barcode"/>
             <tradeItemDescriptionInformation>
-              <longText t-esc="rec.product_id.name" />
+              <longText t-esc="rec.product_id.name"/>
             </tradeItemDescriptionInformation>
-            <invoicedQuantity unitOfMeasure="Caja" t-esc="'%.2f'% rec.product_uom_qty" />
-            <aditionalQuantity QuantityType="NUM_CONSUMER_UNITS" t-esc="rec.product_id.product_units" />
+            <invoicedQuantity unitOfMeasure="Caja" t-esc="'%.2f'% rec.product_uom_qty"/>
+            <aditionalQuantity QuantityType="NUM_CONSUMER_UNITS" t-esc="rec.product_id.product_units"/>
             <grossPrice>
-              <Amount t-esc="'%.2f'% rec.price_unit" />
+              <t t-foreach="rec.tax_id" t-as="tac">
+                <t t-foreach="tac.tag_ids" t-as="tag">
+                  <t t-set="valunit" t-value="rec.price_unit"/>
+                    <t t-if="tag.name != 'IEPS'">
+                       <t t-if="tac.amount != 0">
+                        <t t-set="precdes" t-value="valunit / (1 + (tac.amount / 100)) "/>
+                         <Amount t-esc="'%.2f'% precdes"/>
+                        </t>
+                        <t t-else="">
+                         <Amount t-esc="'%.2f'% valunit"/>
+                        </t>
+                   </t> 
+                </t>
+              </t>
             </grossPrice>
             <netPrice>
-              <Amount t-esc="'%.2f'% rec.price_unit"  />
+               <t t-foreach="rec.tax_id" t-as="tac">
+                <t t-foreach="tac.tag_ids" t-as="tag">
+                  <t t-set="valunit" t-value="rec.price_unit"/>
+                    <t t-if="tag.name != 'IEPS'">
+                       <t t-if="tac.amount != 0">
+                        <t t-set="precdes" t-value="valunit / (1 + (tac.amount / 100)) "/>
+                         <Amount t-esc="'%.2f'% precdes"/>
+                        </t>
+                        <t t-else="">
+                         <Amount t-esc="'%.2f'% valunit"/>
+                        </t>
+                   </t> 
+                </t>
+              </t>
             </netPrice>
             <AdditionalInformation>
-              <referenceIdentification type="ON" t-field="record.fields_sales.number_order"  />
+              <referenceIdentification type="ON" t-field="record.fields_sales.number_order"/>
             </AdditionalInformation>
             <totalLineAmount>
               <grossAmount>
-                <Amount t-esc="'%.2f'% rec.price_unit" />
+               <t t-foreach="rec.tax_id" t-as="tac">
+                <t t-foreach="tac.tag_ids" t-as="tag">
+                  <t t-set="valunit" t-value="rec.price_unit"/>
+                    <t t-if="tag.name != 'IEPS'">
+                       <t t-if="tac.amount != 0">
+                        <t t-set="precdes" t-value="valunit / (1 + (tac.amount / 100)) "/>
+                         <Amount t-esc="'%.2f'% precdes"/>
+                        </t>
+                        <t t-else="">
+                         <Amount t-esc="'%.2f'% valunit"/>
+                        </t>
+                   </t> 
+                </t>
+              </t>
               </grossAmount>
               <netAmount>
-                <amount t-esc="'%.2f'% rec.price_total" />
+                <Amount t-esc="'%.2f'% rec.price_total"/>
                 <!--<t t-set="subtotalformat" t-value="rec.price_subtotal" />
                 <amount t-esc="'%.2f'% float(subtotalformat)" />-->
               </netAmount>
@@ -82,76 +122,77 @@
           </lineItem>
         </t>
         <totalAmount>
-          <t t-set="valamount" t-value="0" />
-          <t t-foreach="record.fields_sales.order_line" t-as="rec" >
+          <t t-set="valamount" t-value="0"/>
+          <t t-foreach="record.fields_sales.order_line" t-as="rec">
             <t t-set="valamount" t-value="valamount + rec.price_subtotal"/>
           </t>
-          <Amount t-esc="'%.2f'% valamount" />
+          <Amount t-esc="'%.2f'% valamount"/>
         </totalAmount>
         <baseAmount>
-          <Amount t-esc="'%.2f'% valamount" />
+          <Amount t-esc="'%.2f'% valamount"/>
         </baseAmount>
-        <t t-set="validiva" t-value="0" />
-        <t t-set="ivatotal" t-value="0" />
-        <t t-set="valiva" t-value="0" />
-        <t t-set="namimp" t-value="0" />
-        <t t-set="validipes" t-value="0" />
-        <t t-set="iepstotal" t-value="0" />
-        <t t-set="namieps" t-value="0" />
-        <t t-foreach="record.fields_sales.order_line" t-as="rec" >
-          <t t-set="amount" t-value="0" />
-          <t t-set="amountiep" t-value="0" />
-            <t t-foreach="rec.tax_id" t-as="tac" >
-              <t t-foreach="tac.tag_ids" t-as="tag" >
+        <t t-set="validiva" t-value="0"/>
+        <t t-set="ivatotal" t-value="0"/>
+        <t t-set="valiva" t-value="0"/>
+        <t t-set="namimp" t-value="0"/>
+        <t t-set="validipes" t-value="0"/>
+        <t t-set="iepstotal" t-value="0"/>
+        <t t-set="namieps" t-value="0"/>
+        <t t-foreach="record.fields_sales.order_line" t-as="rec">
+          <t t-set="amount" t-value="0"/>
+          <t t-set="amountiep" t-value="0"/>
+            <t t-foreach="rec.tax_id" t-as="tac">
+              <t t-foreach="tac.tag_ids" t-as="tag">
                 <t t-if="record.partner_id.show_ieps == False">
                   <t t-if="tag.name != 'IEPS'">
-                    <t t-set="result" t-value="rec.price_unit" />
-                    <t t-set="resultoper" t-value="result * (tac.amount / 100)" />
-                    <t t-set="amount" t-value="amount + resultoper" />
-                    <t t-set="ivatotal" t-value="ivatotal + amount" />
-                    <t t-set="valiva" t-value="tac.amount" />
-                    <t t-set="namimp" t-value="tag.name" />
-                    <t t-set="validiva" t-value="1" />
+                    <t t-set="result" t-value="rec.price_unit"/>
+                    <t t-set="resultoper" t-value="result * (tac.amount / 100)"/>
+                    <t t-set="amount" t-value="amount + resultoper"/>
+                    <t t-set="ivatotal" t-value="ivatotal + amount"/>
+                    <t t-set="valiva" t-value="tac.amount"/>
+                    <t t-set="namimp" t-value="tag.name"/>
+                    <t t-set="validiva" t-value="1"/>
                   </t>
                   <t t-if="tag.name == 'IEPS'">
-                    <t t-set="validieps" t-value="1" />
-                    <t t-set="amountiep" t-value="amountiep + tac.amount" />
-                    <t t-set="iepstotal" t-value="iepstotal + amountiep" />
-                    <t t-set="namieps" t-value="tag.name" />
+                    <t t-set="validieps" t-value="1"/>
+                    <t t-set="amountiep" t-value="amountiep + tac.amount"/>
+                    <t t-set="iepstotal" t-value="iepstotal + amountiep"/>
+                    <t t-set="namieps" t-value="tag.name"/>
                   </t>
                 </t>
               </t>
             </t>
         </t>
-        <t t-if="record.partner_id.show_ieps == False" >
+        <t t-if="record.partner_id.show_ieps == False">
           <tax t-att-type="namimp">
-            <t t-set="amtax" t-value="record.amount_tax" />
-            <taxPercentage t-esc="'%.2f'% valiva" />
-            <taxAmount t-esc="'%.2f'% float(amtax)" />
+            <t t-set="amtax" t-value="record.amount_tax"/>
+            <taxPercentage t-esc="'%.2f'% valiva"/>
+            <taxAmount t-esc="'%.2f'% float(amtax)"/>
             <taxCategory>TRANSFERIDO</taxCategory>
           </tax>
         </t>
-        <t t-else="" >
+        <t t-else="">
           <t t-if="validiva == 1">
             <tax t-att-type="namimp">
-              <t t-set="amtax" t-value="record.amount_tax" />
-              <taxPercentage t-esc="'%.2f'% valiva" />
-              <taxAmount t-esc="'%.2f'% float(amtax)" />
+              <t t-set="amtax" t-value="record.amount_tax"/>
+              <taxPercentage t-esc="'%.2f'% valiva"/>
+              <taxAmount t-esc="'%.2f'% float(amtax)"/>
               <taxCategory>TRANSFERIDO</taxCategory>
             </tax>
           </t>
           <t t-if="validieps == 1">
             <tax t-att-type="namieps">
-              <taxAmount t-esc="'%.2f'% iepstotal" />
+              <taxAmount t-esc="'%.2f'% iepstotal"/>
               <taxCategory>TRANSFERIDO</taxCategory>
             </tax>
           </t>
         </t>
         <payableAmount>
-          <t t-set="amountpay" t-value="record.fields_sales.amount_total" />
-          <Amount t-esc="float(amountpay)" />
+          <t t-set="amountpay" t-value="record.fields_sales.amount_total"/>
+          <Amount t-esc="float(amountpay)"/>
         </payableAmount>
       </requestForPayment>
+
     </template>
     <record id="addenda_tiendas3b" model="ir.ui.view">
       <field name="l10n_mx_edi_addenda_flag">True</field>
