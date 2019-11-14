@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
   <data noupdate="0">
-    <template name="Tiendas 3B" id="addenda_tiendas3b">
+    <template name="Tiendas 3B codigo" id="addenda_tiendas3b">
 
       <requestForPayment type="SimpleInvoiceType" contentVersion="1.3.1" documentStructureVersion="AMC7.1" documentStatus="ORIGINAL">
         <t t-set="xml" t-value="record.l10n_mx_edi_get_xml_etree()"/>
@@ -17,7 +17,7 @@
         </specialInstruction>
         <orderIdentification>
           <referenceIdentification type="ON" t-field="record.fields_sales.number_order"/>
-          <ReferenceDate t-field="record.date_invoice" t-options="{&quot;format&quot;: &quot;yyyy-MM-dd&quot;}" />
+          <ReferenceDate t-field="record.fields_sales.date_of_deli" t-options="{&quot;format&quot;: &quot;yyyy-MM-dd&quot;}" />
         </orderIdentification>
         <AdditionalInformation>
           <referenceIdentification type="ATZ"/>
@@ -29,15 +29,15 @@
         <buyer>
           <gln t-field="record.partner_id.gln"/>
           <contactInformation>
-            <personDepartamentName>
+            <personOrDepartamentName>
               <text t-field="record.partner_id.user_id.name"/>
-            </personDepartamentName>
+            </personOrDepartamentName>
           </contactInformation>
         </buyer>
         <seller>
-          <gln t-field="record.partner_shipping_id.shipping_gln"/>
+          <gln t-field="record.company_id.field_gln_company"/>
           <t t-set="numprov" t-value="record.partner_shipping_id.shipping_number_provider"/>
-          <alternatePartyIdentification type="SELLER_ASSIGNED_IDENTIFIER_FOR_A_PARTY" t-esc="numprov"/>
+          <alternatePartyIdentification type="SELLER_ASSIGNED_IDENTIFIER_FOR_A_PARTY" > </alternatePartyIdentification>
         </seller>
         <shipTo>
           <gln t-field="record.partner_shipping_id.shipping_number_store"/>
@@ -60,7 +60,7 @@
               <longText t-esc="rec.product_id.name"/>
             </tradeItemDescriptionInformation>
             <invoicedQuantity unitOfMeasure="Caja" t-esc="'%.2f'% rec.product_uom_qty"/>
-            <aditionalQuantity QuantityType="NUM_CONSUMER_UNITS" t-esc="rec.product_id.product_units"/>
+            <!--<aditionalQuantity QuantityType="NUM_CONSUMER_UNITS" t-esc="rec.product_id.product_units"/>-->
             <grossPrice>
               <t t-foreach="rec.tax_id" t-as="tac">
                 <t t-foreach="tac.tag_ids" t-as="tag">
