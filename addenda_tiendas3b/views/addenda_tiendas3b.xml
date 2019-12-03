@@ -2,19 +2,15 @@
 <odoo>
   <data noupdate="0">
     <template name="Tiendas 3B codigo" id="addenda_tiendas3b">
-
+        <t t-foreach="record" t-as="t">
+            <t t-if="t.type == 'out_invoice'">
       <requestForPayment type="SimpleInvoiceType" contentVersion="1.3.1" documentStructureVersion="AMC7.1" documentStatus="ORIGINAL">
         <t t-set="xml" t-value="record.l10n_mx_edi_get_xml_etree()"/>
         <deliveryDate t-field="record.date_invoice" t-options="{&quot;format&quot;: &quot;yyyy-MM-dd&quot;}"/>
         <requestForPaymentIdentification>
-          <t t-foreach="record" t-as="t">
-            <t t-if="t.type == 'out_invoice'">
+         
           <entityType>INVOICE</entityType>
-          </t>
-          <t t-else="">
-               <entityType>NOTA DE CREDITO</entityType>
-          </t>
-        </t>
+         
           <t t-set="folio" t-value="xml.get('Folio')"/>
           <t t-set="serie" t-value="xml.get('Serie')"/>
           <uniqueCreatorIdentification t-esc="str(serie)+str(folio)"/>
@@ -199,6 +195,41 @@
           <Amount t-esc="float(amountpay)"/>
         </payableAmount>
       </requestForPayment>
+       </t>
+          <t t-else="">
+             <requestForPayment type="SimpleInvoiceType" contentVersion="1.3.1" documentStructureVersion="AMC7.1" documentStatus="ORIGINAL" >
+         <t t-set="xml" t-value="record.l10n_mx_edi_get_xml_etree()"/>
+        <deliveryDate t-field="record.date_invoice" t-options="{&quot;format&quot;: &quot;yyyy-MM-dd&quot;}"/>
+        <requestForPaymentIdentification>
+         
+           <entityType>CREDIT NOTE</entityType>
+         
+          <t t-set="folio" t-value="xml.get('Folio')"/>
+          <t t-set="serie" t-value="xml.get('Serie')"/>
+          <uniqueCreatorIdentification t-esc="str(serie)+str(folio)"/>
+        </requestForPaymentIdentification>
+        <specialInstruction code="ZZZ">
+          <text t-field="record.amount_to_text"/>
+        </specialInstruction>
+        <specialInstruction code="PUR">
+          <text/>
+        </specialInstruction>
+        <orderIdentification>
+          <referenceIdentification type="ON" />
+       </orderIdentification>
+        <AdditionalInformation>
+          <referenceIdentification type="ATZ"/>
+          <referenceIdentification type="CLAVE" t-field="record.origin"></referenceIdentification>
+        </AdditionalInformation>
+        <DeliveryNote>
+         
+          <ReferenceDate/>
+        </DeliveryNote>
+       
+      </requestForPayment>
+              
+          </t>
+        </t>
 
     </template>
     <record id="addenda_tiendas3b" model="ir.ui.view">
