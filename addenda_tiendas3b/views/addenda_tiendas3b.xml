@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
   <data noupdate="0">
-    <template name="Tiendas 3B codigo" id="addenda_tiendas3b">
+    <template name="Tiendas 3B C" id="addenda_tiendas3b">
         <t t-foreach="record" t-as="t">
             <t t-if="t.type == 'out_invoice'">
       <requestForPayment type="SimpleInvoiceType" contentVersion="1.3.1" documentStructureVersion="AMC7.1" documentStatus="ORIGINAL">
