@@ -1,7 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?>
-<odoo>
-  <data noupdate="0">
-    <template name="Tiendas 3B C" id="addenda_tiendas3b">
+<?xml version="1.0"?>
+<t name="Tiendas 3B C" t-name="addenda_tiendas3b.addenda_tiendas3b">
         <t t-foreach="record" t-as="t">
             <t t-if="t.type == 'out_invoice'">
       <requestForPayment type="SimpleInvoiceType" contentVersion="1.3.1" documentStructureVersion="AMC7.1" documentStatus="ORIGINAL">
@@ -20,14 +18,14 @@
         </specialInstruction>
         <orderIdentification>
           <referenceIdentification type="ON" t-field="record.fields_sales.number_order"/>
-          <ReferenceDate t-field="record.fields_sales.date_of_deli" t-options="{&quot;format&quot;: &quot;yyyy-MM-dd&quot;}" />
+          <ReferenceDate t-field="record.date_invoice" t-options="{&quot;format&quot;: &quot;yyyy-MM-dd&quot;}"/>
         </orderIdentification>
         <AdditionalInformation>
           <referenceIdentification type="ATZ"/>
         </AdditionalInformation>
         <DeliveryNote>
           <referenceIdentification t-esc="str(serie)+str(folio)"/>
-          <ReferenceDate t-field="record.date_invoice" t-options="{&quot;format&quot;: &quot;yyyy-MM-dd&quot;}"/>
+          <ReferenceDate t-field="record.fields_sales.date_of_deli" t-options="{&quot;format&quot;: &quot;yyyy-MM-dd&quot;}"/>
         </DeliveryNote>
         <buyer>
           <gln t-field="record.partner_id.gln"/>
@@ -40,13 +38,15 @@
         <seller>
           <gln t-field="record.company_id.field_gln_company"/>
           <t t-set="numprov" t-value="record.partner_shipping_id.shipping_number_provider"/>
-          <alternatePartyIdentification type="SELLER_ASSIGNED_IDENTIFIER_FOR_A_PARTY" > </alternatePartyIdentification>
+          <alternatePartyIdentification type="SELLER_ASSIGNED_IDENTIFIER_FOR_A_PARTY"> </alternatePartyIdentification>
         </seller>
         <shipTo>
           <gln t-field="record.partner_shipping_id.shipping_number_store"/>
           <nameAndAddress>
             <name t-field="record.partner_shipping_id.name"/>
-            <streetAddressOne t-field="record.partner_shipping_id.street"/>
+              <t t-set="street" t-value="record.partner_shipping_id.street"/>
+              <t t-set="colony" t-value="record.partner_shipping_id.l10n_mx_edi_colony"/>
+            <streetAddressOne t-esc="str(street) +str(' ')+ str(colony)"/>
             <city t-field="record.partner_shipping_id.city"/>
             <postalCode t-field="record.partner_shipping_id.zip"/>
           </nameAndAddress>
@@ -197,7 +197,7 @@
       </requestForPayment>
        </t>
           <t t-else="">
-             <requestForPayment type="SimpleInvoiceType" contentVersion="1.3.1" documentStructureVersion="AMC7.1" documentStatus="ORIGINAL" >
+             <requestForPayment type="SimpleInvoiceType" contentVersion="1.3.1" documentStructureVersion="AMC7.1" documentStatus="ORIGINAL">
          <t t-set="xml" t-value="record.l10n_mx_edi_get_xml_etree()"/>
         <deliveryDate t-field="record.date_invoice" t-options="{&quot;format&quot;: &quot;yyyy-MM-dd&quot;}"/>
         <requestForPaymentIdentification>
@@ -215,11 +215,11 @@
           <text/>
         </specialInstruction>
         <orderIdentification>
-          <referenceIdentification type="ON" />
+          <referenceIdentification type="ON"/>
        </orderIdentification>
         <AdditionalInformation>
           <referenceIdentification type="ATZ"/>
-          <referenceIdentification type="CLAVE" t-field="record.origin"></referenceIdentification>
+          <referenceIdentification type="CLAVE" t-field="record.origin"/>
         </AdditionalInformation>
         <DeliveryNote>
          
@@ -231,9 +231,5 @@
           </t>
         </t>
 
-    </template>
-    <record id="addenda_tiendas3b" model="ir.ui.view">
-      <field name="l10n_mx_edi_addenda_flag">True</field>
-    </record>
-  </data>
-</odoo>
+    </t>
+    
