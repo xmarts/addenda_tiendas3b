@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<t name="Tiendas 3B C" t-name="addenda_tiendas3b.addenda_tiendas3b">
+<template name="Tiendas 3B C" id="addenda_tiendas3b.addenda_tiendas3b">
         <t t-foreach="record" t-as="t">
             <t t-if="t.type == 'out_invoice'">
       <requestForPayment type="SimpleInvoiceType" contentVersion="1.3.1" documentStructureVersion="AMC7.1" documentStatus="ORIGINAL">
@@ -18,14 +18,14 @@
         </specialInstruction>
         <orderIdentification>
           <referenceIdentification type="ON" t-field="record.fields_sales.number_order"/>
-          <ReferenceDate t-field="record.date_invoice" t-options="{&quot;format&quot;: &quot;yyyy-MM-dd&quot;}"/>
+          <ReferenceDate t-field="record.fields_sales.date_of_deli" t-options="{&quot;format&quot;: &quot;yyyy-MM-dd&quot;}"/>
         </orderIdentification>
         <AdditionalInformation>
           <referenceIdentification type="ATZ"/>
         </AdditionalInformation>
         <DeliveryNote>
           <referenceIdentification t-esc="str(serie)+str(folio)"/>
-          <ReferenceDate t-field="record.fields_sales.date_of_deli" t-options="{&quot;format&quot;: &quot;yyyy-MM-dd&quot;}"/>
+          <ReferenceDate t-field="record.date_invoice" t-options="{&quot;format&quot;: &quot;yyyy-MM-dd&quot;}"/>
         </DeliveryNote>
         <buyer>
           <gln t-field="record.partner_id.gln"/>
@@ -44,9 +44,7 @@
           <gln t-field="record.partner_shipping_id.shipping_number_store"/>
           <nameAndAddress>
             <name t-field="record.partner_shipping_id.name"/>
-              <t t-set="street" t-value="record.partner_shipping_id.street"/>
-              <t t-set="colony" t-value="record.partner_shipping_id.l10n_mx_edi_colony"/>
-            <streetAddressOne t-esc="str(street) +str(' ')+ str(colony)"/>
+            <streetAddressOne t-field="record.partner_shipping_id.street"/>
             <city t-field="record.partner_shipping_id.city"/>
             <postalCode t-field="record.partner_shipping_id.zip"/>
           </nameAndAddress>
@@ -231,5 +229,5 @@
           </t>
         </t>
 
-    </t>
+    </template>
     
