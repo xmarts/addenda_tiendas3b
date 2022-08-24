@@ -64,7 +64,8 @@
                                 <invoicedQuantity unitOfMeasure="Caja" t-esc="'%.2f'% rec.product_uom_qty"/>
                                 <!--<aditionalQuantity QuantityType="NUM_CONSUMER_UNITS" t-esc="rec.product_id.product_units"/>-->
                                 <grossPrice>
-                                    <t t-foreach="rec.tax_id" t-as="tac">
+                                    <!-- FIXME: Descomentar esta parte -->
+                                    <!-- <t t-foreach="rec.tax_id" t-as="tac">
                                         <t t-foreach="tac.tag_ids" t-as="tag">
                                             <t t-set="valunit" t-value="rec.price_unit"/>
                                             <t t-if="tag.name != 'IEPS'">
@@ -77,11 +78,12 @@
                                                 </t>
                                             </t>
                                         </t>
-                                    </t>
+                                    </t> -->
                                 </grossPrice>
                                 <netPrice>
                                   <t t-foreach="rec.tax_id" t-as="tac">
-                                    <t t-foreach="tac.tag_ids" t-as="tag">
+                                    <!-- FIXME: Descomentar esta parte -->
+                                    <!-- <t t-foreach="tac.tag_ids" t-as="tag">
                                       <t t-set="valunit" t-value="rec.price_unit"/>
                                         <t t-if="tag.name != 'IEPS'">
                                           <t t-if="tac.amount != 0">
@@ -92,7 +94,7 @@
                                             <Amount t-esc="'%.2f'% valunit"/>
                                             </t>
                                       </t>
-                                    </t>
+                                    </t> -->
                                   </t>
                                 </netPrice>
                                 <AdditionalInformation>
@@ -101,7 +103,8 @@
                                 <totalLineAmount>
                                     <grossAmount>
                                         <t t-foreach="rec.tax_id" t-as="tac">
-                                            <t t-foreach="tac.tag_ids" t-as="tag">
+                                            <!-- FIXME: Descomentar esta parte -->
+                                            <!-- <t t-foreach="tac.tag_ids" t-as="tag">
                                                 <t t-set="valunit" t-value="rec.price_unit"/>
                                                 <t t-if="tag.name != 'IEPS'">
                                                     <t t-if="tac.amount != 0">
@@ -112,7 +115,7 @@
                                                         <Amount t-esc="'%.2f'% valunit"/>
                                                     </t>
                                                 </t>
-                                            </t>
+                                            </t> -->
                                         </t>
                                     </grossAmount>
                                     <netAmount>
@@ -144,9 +147,9 @@
                             <t t-set="amount" t-value="0"/>
                             <t t-set="amountiep" t-value="0"/>
                             <t t-foreach="rec.tax_id" t-as="tac">
-                                <t t-foreach="tac.tag_ids" t-as="tag">
-                                    <!-- FIXME: Descomentar esta parte -->
-                                    <!-- <t t-if="record.partner_id.show_ieps == False">
+                                <!-- FIXME: Descomentar esta parte -->
+                                <!-- <t t-foreach="tac.tag_ids" t-as="tag">
+                                    <t t-if="record.partner_id.show_ieps == False">
                                         <t t-if="tag.name != 'IEPS'">
                                             <t t-set="result" t-value="rec.price_unit"/>
                                             <t t-set="resultoper" t-value="result * (tac.amount / 100)"/>
@@ -162,8 +165,8 @@
                                             <t t-set="iepstotal" t-value="iepstotal + amountiep"/>
                                             <t t-set="namieps" t-value="tag.name"/>
                                         </t>
-                                    </t> -->
-                                </t>
+                                    </t>
+                                </t> -->
                             </t>
                         </t>
                         <!-- FIXME: Descomentar esta parte -->
