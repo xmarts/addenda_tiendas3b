@@ -2,7 +2,7 @@
 <odoo>
     <data noupdate="0">
         <template name="Tiendas 3B C" id="addenda_tiendas3b">
-            <t t-foreach="record" t-as="t">
+             <t t-foreach="record" t-as="t">
                 <t t-if="t.move_type == 'out_invoice'">
                     <requestForPayment type="SimpleInvoiceType" contentVersion="1.3.1" documentStructureVersion="AMC7.1" documentStatus="ORIGINAL">
                         <!-- <t t-set="xml" t-value="record.l10n_mx_edi_get_xml_etree()"/> -->
@@ -70,8 +70,9 @@
                                         <t t-set="valunit" t-value="rec.price_unit"/>
                                         <t t-if="tac.ieps == False">
                                             <t t-if="tac.amount != 0">
-                                                <!-- <t t-set="precdes" t-value="valunit / (1 + (tac.amount / 100)) "/> -->
-                                                <t t-set="precdes" t-value="(rec.product_uom_qty * valunit/1.16)*0.16"/>
+                                                <!-- -->
+                                                <!-- <t t-set="precdes" t-value="(rec.product_uom_qty * valunit/1.16)*0.16"/> -->
+                                                <t t-set="precdes" t-value="valunit / (1 + (tac.amount / 100)) "/> 
                                                 <Amount t-esc="'%.2f'% precdes"/>
                                             </t>
                                             <t t-else="">
@@ -88,7 +89,8 @@
                                         <t t-if="tac.ieps == False">
                                             <t t-if="tac.amount != 0">
                                                 <!-- <t t-set="precdes" t-value="valunit / (1 + (tac.amount / 100)) "/> -->
-                                                <t t-set="precdes" t-value="(rec.product_uom_qty * valunit/1.16)*0.16"/>
+                                                <!-- <t t-set="precdes" t-value="(rec.product_uom_qty * valunit/1.16)*0.16"/> -->
+                                                <t t-set="precdes" t-value="valunit / (1 + (tac.amount / 100)) "/>
                                                 <Amount t-esc="'%.2f'% precdes"/>
                                             </t>
                                             <t t-else="">
@@ -107,8 +109,8 @@
                                             <t t-set="valunit" t-value="rec.price_unit"/>
                                             <t t-if="tac.ieps == False">
                                                 <t t-if="tac.amount != 0">
-                                                    <!-- <t t-set="precdes" t-value="valunit / (1 + (tac.amount / 100)) "/> -->
-                                                    <t t-set="precdes" t-value="(rec.product_uom_qty * valunit/1.16)*0.16"/>
+                                                    <t t-set="precdes" t-value="valunit / (1 + (tac.amount / 100)) "/>
+                                                    <!-- <t t-set="precdes" t-value="(rec.product_uom_qty * valunit/1.16)*0.16"/> -->
                                                     <Amount t-esc="'%.2f'% precdes"/>
                                                 </t>
                                                 <t t-else="">
@@ -138,17 +140,18 @@
                         <t t-set="validiva" t-value="0"/>
                         <t t-set="ivatotal" t-value="0"/>
                         <t t-set="valiva" t-value="0"/>
-                        <t t-set="namimp" t-value="0"/>
+                        <t t-set="namimp" t-value="'IVA'"/>
                         <t t-set="validipes" t-value="0"/>
                         <t t-set="iepstotal" t-value="0"/>
                         <t t-set="namieps" t-value="0"/>
+                        <t t-set="amtax" t-value="0"/>
                         <t t-foreach="record.fields_sales.order_line" t-as="rec">
                             <t t-set="amount" t-value="0"/>
                             <t t-set="amountiep" t-value="0"/>
                             <t t-foreach="rec.tax_id" t-as="tac">
                                 <!-- FIXME: Revisar esta parte -->
-                                <t t-if="record.partner_id.show_ieps == False">
-                                    <t t-if="tac.ieps == False">
+                                <!-- <t t-if="record.partner_id.show_ieps == False"> -->
+                                    <!-- <t t-if="tac.ieps == False"> -->
                                         <!-- <t t-set="result" t-value="rec.price_unit"/>
                                         <t t-set="resultoper" t-value="result * (tac.amount / 100)"/>
                                         <t t-set="amount" t-value="amount + resultoper"/>
@@ -156,7 +159,7 @@
                                         <t t-set="valiva" t-value="tac.amount"/>
                                         <t t-set="namimp" t-value="tag.name"/>
                                         <t t-set="validiva" t-value="1"/> -->
-                                        <t t-set="result" t-value="rec.price_unit"/>
+                                        <!-- <t t-set="result" t-value="rec.price_unit"/>
                                         <t t-set="resultoper" t-value="(rec.product_uom_qty * valunit/1.16)*0.16"/>
                                         <t t-set="amount" t-value="amount + resultoper"/>
                                         <t t-set="ivatotal" t-value="ivatotal + amount"/>
@@ -167,15 +170,20 @@
                                     <t t-if="tac.ieps == True">
                                         <t t-set="validieps" t-value="1"/>
                                         <t t-set="amountiep" t-value="amountiep + tac.amount"/>
-                                        <t t-set="iepstotal" t-value="iepstotal + amountiep"/>
+                                        <t t-set="iepstotal" t-value="iepstotal + amountiep"/> -->
                                         <!-- <t t-set="namieps" t-value="tag.name"/> -->
-                                        <t t-set="namieps" t-value="'IEPS'"/>
+                                      <!--   <t t-set="namieps" t-value="'IEPS'"/>
                                     </t>
+                                </t> -->
+                                <t t-set="valiva" t-value="tac.amount"/>
+                                <t t-if="tac.amount > 0">
+                                    <t t-set="amtax" t-value="amtax + (((rec.price_unit * rec.product_uom_qty) / ((tac.amount / 100) + 1)) * (tac.amount / 100))"/>
                                 </t>
+
                             </t>
                         </t>
                         <!-- FIXME: Revisar esta parte -->
-                        <t t-if="record.partner_id.show_ieps == False">
+                        <!-- <t t-if="record.partner_id.show_ieps == False">
                             <tax t-att-type="namimp">
                                 <t t-set="amtax" t-value="record.amount_tax"/>
                                 <taxPercentage t-esc="'%.2f'% valiva"/>
@@ -198,7 +206,13 @@
                                     <taxCategory>TRANSFERIDO</taxCategory>
                                 </tax>
                             </t>
-                        </t>
+                        </t> -->
+
+                        <tax t-att-type="namimp">
+                            <taxPercentage t-esc="'%.2f'% valiva"/>
+                            <taxAmount t-esc="'%.2f'% amtax"/>
+                            <taxCategory>TRANSFERIDO</taxCategory>
+                        </tax>
 
                         <payableAmount>
                             <t t-set="amountpay" t-value="record.fields_sales.amount_total"/>
