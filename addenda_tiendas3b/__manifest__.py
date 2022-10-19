@@ -13,5 +13,6 @@
     'data': [
         # 'security/ir.model.access.csv',
         'views/addenda_tiendas3b.xml',
+        #'views/account_move.xml',
     ],
 }

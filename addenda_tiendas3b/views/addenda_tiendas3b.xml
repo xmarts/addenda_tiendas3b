@@ -65,22 +65,19 @@
                                 <!--<aditionalQuantity QuantityType="NUM_CONSUMER_UNITS" t-esc="rec.product_id.product_units"/>-->
                                 <grossPrice>
                                     <!-- FIXME: Revisar esta parte -->
+
                                     <t t-foreach="rec.tax_id" t-as="tac">
-                                        <!-- <t t-foreach="tac.tag_ids" t-as="tag"> -->
                                         <t t-set="valunit" t-value="rec.price_unit"/>
                                         <t t-if="tac.ieps == False">
                                             <t t-if="tac.amount != 0">
-                                                <!-- -->
-                                                <!-- <t t-set="precdes" t-value="(rec.product_uom_qty * valunit/1.16)*0.16"/> -->
-                                                <t t-set="precdes" t-value="valunit / (1 + (tac.amount / 100)) "/> 
+                                            <t t-set="precdes" t-value="valunit / (1 + (tac.amount / 100)) "/>
                                                 <Amount t-esc="'%.2f'% precdes"/>
                                             </t>
                                             <t t-else="">
                                                 <Amount t-esc="'%.2f'% valunit"/>
                                             </t>
-                                        </t>
-                                        <!-- </t> -->
-                                    </t>
+                                        </t> 
+                                      </t>
                                 </grossPrice>
                                 <netPrice>
                                     <t t-foreach="rec.tax_id" t-as="tac">
@@ -127,93 +124,105 @@
                                 </totalLineAmount>
                             </lineItem>
                         </t>
-                        <totalAmount>
-                            <t t-set="valamount" t-value="0"/>
-                            <t t-foreach="record.fields_sales.order_line" t-as="rec">
-                                <t t-set="valamount" t-value="valamount + rec.price_subtotal"/>
+                        <t t-set="amount" t-value="0"/>
+                        <t t-set="amountot" t-value="0"/>
+                        <t t-set="amountieps" t-value="0"/>
+                        <t t-foreach="record.invoice_line_ids" t-as="rec">
+                            <t t-foreach="rec.tax_ids" t-as="tac">
+                                <!-- FIXME: Revisar esta parte -->
+                                <t t-if="record.partner_id.show_ieps == False">
+                                    <t t-if="tac.ieps == True">
+                                        <t t-if="tac.amount_type == 'fixed'">
+                                            <t t-set="amountieps" t-value="tac.amount * (rec.price_unit *  rec.quantity)"/>
+                                        </t>
+                                    </t>
+                                    <t t-if="tac.ieps == False">
+                                        <t t-if="tac.amount != 0">
+                                            <t t-set="result" t-value="rec.price_unit *  rec.quantity"/>
+                                            <!-- <t t-set="resultoper" t-value="result * (tac.amount / 100)"/> -->
+                                            <t t-set="result" t-value="rec.price_unit"/>
+                                            <t t-set="resultoper" t-value="result * (tac.amount / 100)"/>
+                                            <t t-set="amount" t-value="amount + resultoper"/>
+                                            <t t-set="amountot" t-value="amount * rec.quantity"/>
+                                        </t>
+                                    </t>
+                                </t>
+                                <t t-else="">
+                                    <t t-if="tac.ieps == False">
+                                        <t t-if="tac.amount != 0">
+                                            <t t-set="result" t-value="rec.price_unit * rec.quantity"/>
+                                            <!-- <t t-set="resultoper" t-value="result * (tac.amount / 100)"/> -->
+                                            <t t-set="result" t-value="rec.price_unit"/>
+                                            <t t-set="resultoper" t-value="result * (tac.amount / 100)"/>
+                                            <t t-set="amount" t-value="amount + resultoper"/>
+                                            <t t-set="amountot" t-value="amount * rec.quantity"/>
+                                        </t>
+                                    </t>
+                                </t>
                             </t>
-                            <Amount t-esc="'%.2f'% valamount"/>
+                        </t>
+                        <t t-set="totalamount" t-value="record.total_amount()"/>
+                        <totalAmount>
+                            <Amount t-esc="'%.2f'% totalamount"/>
                         </totalAmount>
                         <baseAmount>
-                            <Amount t-esc="'%.2f'% valamount"/>
+                            <Amount t-esc="'%.2f'% totalamount"/>
                         </baseAmount>
                         <t t-set="validiva" t-value="0"/>
                         <t t-set="ivatotal" t-value="0"/>
                         <t t-set="valiva" t-value="0"/>
-                        <t t-set="namimp" t-value="'IVA'"/>
+                        <t t-set="namimp" t-value="0"/>
                         <t t-set="validipes" t-value="0"/>
                         <t t-set="iepstotal" t-value="0"/>
                         <t t-set="namieps" t-value="0"/>
-                        <t t-set="amtax" t-value="0"/>
                         <t t-foreach="record.fields_sales.order_line" t-as="rec">
-                            <t t-set="amount" t-value="0"/>
-                            <t t-set="amountiep" t-value="0"/>
+                          <t t-set="amount" t-value="0"/>
+                          <t t-set="amountiep" t-value="0"/>
                             <t t-foreach="rec.tax_id" t-as="tac">
-                                <!-- FIXME: Revisar esta parte -->
-                                <!-- <t t-if="record.partner_id.show_ieps == False"> -->
-                                    <!-- <t t-if="tac.ieps == False"> -->
-                                        <!-- <t t-set="result" t-value="rec.price_unit"/>
-                                        <t t-set="resultoper" t-value="result * (tac.amount / 100)"/>
-                                        <t t-set="amount" t-value="amount + resultoper"/>
-                                        <t t-set="ivatotal" t-value="ivatotal + amount"/>
-                                        <t t-set="valiva" t-value="tac.amount"/>
-                                        <t t-set="namimp" t-value="tag.name"/>
-                                        <t t-set="validiva" t-value="1"/> -->
-                                        <!-- <t t-set="result" t-value="rec.price_unit"/>
-                                        <t t-set="resultoper" t-value="(rec.product_uom_qty * valunit/1.16)*0.16"/>
-                                        <t t-set="amount" t-value="amount + resultoper"/>
-                                        <t t-set="ivatotal" t-value="ivatotal + amount"/>
-                                        <t t-set="valiva" t-value="tac.amount"/>
-                                        <t t-set="namimp" t-value="'IVA'"/>
-                                        <t t-set="validiva" t-value="1"/>
-                                    </t>
-                                    <t t-if="tac.ieps == True">
-                                        <t t-set="validieps" t-value="1"/>
-                                        <t t-set="amountiep" t-value="amountiep + tac.amount"/>
-                                        <t t-set="iepstotal" t-value="iepstotal + amountiep"/> -->
-                                        <!-- <t t-set="namieps" t-value="tag.name"/> -->
-                                      <!--   <t t-set="namieps" t-value="'IEPS'"/>
-                                    </t>
-                                </t> -->
-                                <t t-set="valiva" t-value="tac.amount"/>
-                                <t t-if="tac.amount > 0">
-                                    <t t-set="amtax" t-value="amtax + (((rec.price_unit * rec.product_uom_qty) / ((tac.amount / 100) + 1)) * (tac.amount / 100))"/>
+                                <t t-if="record.partner_id.show_ieps == False">
+                                  <t t-if="tac.ieps == False">
+                                    <t t-set="result" t-value="rec.price_unit"/>
+                                    <t t-set="resultoper" t-value="result * (tac.amount / 100)"/>
+                                    <t t-set="amount" t-value="amount + resultoper"/>
+                                    <t t-set="ivatotal" t-value="ivatotal + amount"/>
+                                    <t t-set="valiva" t-value="tac.amount"/>
+                                    <t t-set="namimp" t-value="IVA"/>
+                                    <t t-set="validiva" t-value="1"/>
+                                  </t>
+                                  <t t-if="tac.ieps == True">
+                                    <t t-set="validieps" t-value="1"/>
+                                    <t t-set="amountiep" t-value="amountiep + tac.amount"/>
+                                    <t t-set="iepstotal" t-value="iepstotal + amountiep"/>
+                                    <t t-set="namieps" t-value="IEPS"/>
+                                  </t>
                                 </t>
-
                             </t>
                         </t>
-                        <!-- FIXME: Revisar esta parte -->
-                        <!-- <t t-if="record.partner_id.show_ieps == False">
-                            <tax t-att-type="namimp">
-                                <t t-set="amtax" t-value="record.amount_tax"/>
-                                <taxPercentage t-esc="'%.2f'% valiva"/>
-                                <taxAmount t-esc="'%.2f'% float(amtax)"/>
-                                <taxCategory>TRANSFERIDO</taxCategory>
-                            </tax>
+                        <t t-set="amountiva" t-value="record.amount_iva()"/>
+                        <t t-if="record.partner_id.show_ieps == False">
+                          <tax type="IVA">
+                            <t t-set="amtax" t-value="record.amount_tax"/>
+                            <taxPercentage t-esc="'%.2f'% valiva"/>
+                            <taxAmount t-esc="'%.2f'% float(amountiva)"/>
+                            <taxCategory>TRANSFERIDO</taxCategory>
+                          </tax>
                         </t>
                         <t t-else="">
-                            <t t-if="validiva == 1">
-                                <tax t-att-type="namimp">
-                                    <t t-set="amtax" t-value="record.amount_tax"/>
-                                    <taxPercentage t-esc="'%.2f'% valiva"/>
-                                    <taxAmount t-esc="'%.2f'% float(amtax)"/>
-                                    <taxCategory>TRANSFERIDO</taxCategory>
-                                </tax>
-                            </t>
-                            <t t-if="validieps == 1">
-                                <tax t-att-type="namieps">
-                                    <taxAmount t-esc="'%.2f'% iepstotal"/>
-                                    <taxCategory>TRANSFERIDO</taxCategory>
-                                </tax>
-                            </t>
-                        </t> -->
-
-                        <tax t-att-type="namimp">
-                            <taxPercentage t-esc="'%.2f'% valiva"/>
-                            <taxAmount t-esc="'%.2f'% amtax"/>
-                            <taxCategory>TRANSFERIDO</taxCategory>
-                        </tax>
-
+                          <t t-if="validiva == 1">
+                            <tax type="IVA">
+                              <t t-set="amtax" t-value="record.amount_tax"/>
+                              <taxPercentage t-esc="'%.2f'% valiva"/>
+                              <taxAmount t-esc="'%.2f'% float(amountiva)"/>
+                              <taxCategory>TRANSFERIDO</taxCategory>
+                            </tax>
+                          </t>
+                          <t t-if="validieps == 1">
+                            <tax t-att-type="namieps">
+                              <taxAmount t-esc="'%.2f'% iepstotal"/>
+                              <taxCategory>TRANSFERIDO</taxCategory>
+                            </tax>
+                          </t>
+                        </t>
                         <payableAmount>
                             <t t-set="amountpay" t-value="record.fields_sales.amount_total"/>
                             <Amount t-esc="float(amountpay)"/>
