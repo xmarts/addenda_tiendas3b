@@ -231,7 +231,7 @@
                 </t>
                 <t t-else="">
                     <requestForPayment type="SimpleInvoiceType" contentVersion="1.3.1" documentStructureVersion="AMC7.1" documentStatus="ORIGINAL">
-                        <t t-set="xml" t-value="record.l10n_mx_edi_get_xml_etree()"/>
+                       <t t-set="xml" t-value="record._get_values_addenda()"/>
                         <deliveryDate t-field="record.invoice_date" t-options="{&quot;format&quot;: &quot;yyyy-MM-dd&quot;}"/>
                         <requestForPaymentIdentification>
                             <entityType>CREDIT NOTE</entityType>
@@ -250,7 +250,7 @@
                         </orderIdentification>
                         <AdditionalInformation>
                             <referenceIdentification type="ATZ"/>
-                            <referenceIdentification type="CLAVE" t-field="record.origin"/>
+                            <referenceIdentification type="CLAVE" t-field="record.invoice_origin"/>
                         </AdditionalInformation>
                         <DeliveryNote>
                             <ReferenceDate/>
