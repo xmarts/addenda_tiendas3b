@@ -7,7 +7,7 @@ class AccountMove(models.Model):
     _inherit = "account.move"
 
     def test(self, v1):
-        print("TEST+++++++++++++++++++++",v1)
+        print("TEST++++++++++++++++++++++",v1)
 
     def total_amount(self):
         for rec in self:
